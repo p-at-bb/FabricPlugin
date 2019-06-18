@@ -1,14 +1,14 @@
 
-const fs = require("fs");
-const path = require("path");
-const utilities = require("./utilities");
-const xcode = require("xcode");
+var fs = require("fs");
+var path = require("path");
+var utilities = require("./utilities");
+var xcode = require("xcode");
 
 /**
  * This is used as the display text for the build phase block in XCode as well as the
  * inline comments inside of the .pbxproj file for the build script phase block.
  */
-const comment = "\"Fabric.io: Crashlytics\"";
+var comment = "\"Fabric.io: Crashlytics\"";
 
 module.exports = {
 
@@ -20,18 +20,18 @@ module.exports = {
      */
     addShellScriptBuildPhase: function (context, xcodeProjectPath) {
 
-        const pluginConfig = utilities.getPluginConfig("ios");
+        var pluginConfig = utilities.getPluginConfig("ios");
 
         // Read and parse the XCode project (.pxbproj) from disk.
         // File format information: http://www.monobjc.net/xcode-project-file-format.html
-        const xcodeProject = xcode.project(xcodeProjectPath);
+        var xcodeProject = xcode.project(xcodeProjectPath);
         xcodeProject.parseSync();
 
         // Build the body of the script to be executed during the build phase.
-        const script = '"' + '\\"${SRCROOT}\\"' + "/\\\"" + utilities.getAppName(context) + "\\\"/Plugins/cordova-fabric-plugin/Fabric.framework/run " + pluginConfig.apiKey + " " + pluginConfig.apiSecret + '"';
+        var script = '"' + '\\"${SRCROOT}\\"' + "/\\\"" + utilities.getAppName(context) + "\\\"/Plugins/cordova-fabric-plugin/Fabric.framework/run " + pluginConfig.apiKey + " " + pluginConfig.apiSecret + '"';
 
         // Generate a unique ID for our new build phase.
-        const id = xcodeProject.generateUuid();
+        var id = xcodeProject.generateUuid();
         // Create the build phase.
         xcodeProject.hash.project.objects.PBXShellScriptBuildPhase[id] = {
             isa: "PBXShellScriptBuildPhase",
@@ -50,14 +50,14 @@ module.exports = {
         xcodeProject.hash.project.objects.PBXShellScriptBuildPhase[id + "_comment"] = comment;
 
         // Add this new shell script build phase block to the targets.
-        for (const nativeTargetId in xcodeProject.hash.project.objects.PBXNativeTarget) {
+        for (var nativeTargetId in xcodeProject.hash.project.objects.PBXNativeTarget) {
 
             // Skip over the comment blocks.
             if (nativeTargetId.indexOf("_comment") !== -1) {
                 continue;
             }
 
-            const nativeTarget = xcodeProject.hash.project.objects.PBXNativeTarget[nativeTargetId];
+            var nativeTarget = xcodeProject.hash.project.objects.PBXNativeTarget[nativeTargetId];
 
             nativeTarget.buildPhases.push({
                 value: id,
@@ -77,17 +77,17 @@ module.exports = {
 
         // Read and parse the XCode project (.pxbproj) from disk.
         // File format information: http://www.monobjc.net/xcode-project-file-format.html
-        const xcodeProject = xcode.project(xcodeProjectPath);
+        var xcodeProject = xcode.project(xcodeProjectPath);
         xcodeProject.parseSync();
 
         // First, we want to delete the build phase block itself.
 
-        const buildPhases = xcodeProject.hash.project.objects.PBXShellScriptBuildPhase;
+        var buildPhases = xcodeProject.hash.project.objects.PBXShellScriptBuildPhase;
 
-        for (const buildPhaseId in buildPhases) {
+        for (var buildPhaseId in buildPhases) {
 
-            const buildPhase = xcodeProject.hash.project.objects.PBXShellScriptBuildPhase[buildPhaseId];
-            const shouldDelete = false;
+            var buildPhase = xcodeProject.hash.project.objects.PBXShellScriptBuildPhase[buildPhaseId];
+            var shouldDelete = false;
 
             if (buildPhaseId.indexOf("_comment") === -1) {
                 // Dealing with a build phase block.
@@ -109,16 +109,16 @@ module.exports = {
 
         // Second, we want to delete the native target reference to the block.
 
-        const nativeTargets = xcodeProject.hash.project.objects.PBXNativeTarget;
+        var nativeTargets = xcodeProject.hash.project.objects.PBXNativeTarget;
 
-        for (const nativeTargetId in nativeTargets) {
+        for (var nativeTargetId in nativeTargets) {
 
             // Skip over the comment blocks.
             if (nativeTargetId.indexOf("_comment") !== -1) {
                 continue;
             }
 
-            const nativeTarget = nativeTargets[nativeTargetId];
+            var nativeTarget = nativeTargets[nativeTargetId];
 
             // We remove the reference to the block by filtering out the the ones that match.
             nativeTarget.buildPhases = nativeTarget.buildPhases.filter(function (buildPhase) {
